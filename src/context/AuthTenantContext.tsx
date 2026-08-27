@@ -7,6 +7,10 @@ interface AuthTenantContextType {
   user: UserProfile;
   tenants: Tenant[];
   users: UserProfile[];
+  isAuthenticated: boolean;
+  login: (tenantId: string, userUid?: string) => void;
+  logout: () => void;
+  addTenant: (tenantData: Omit<Tenant, 'id' | 'createdAt'>) => string;
   setTenantId: (tenantId: string) => void;
   setUserRole: (role: UserRole) => void;
   setUserUid: (uid: string) => void;
@@ -26,26 +30,24 @@ const AuthTenantContext = createContext<AuthTenantContextType | undefined>(undef
 
 const TENANT_STORAGE_KEY = 'rsmotors_tenants_v2';
 const USER_STORAGE_KEY = 'rsmotors_current_user_v2';
+const AUTH_STORAGE_KEY = 'rsmotors_auth_state_v2';
 
 export const AuthTenantProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [tenants, setTenants] = useState<Tenant[]>(() => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     try {
-      const stored = localStorage.getItem(TENANT_STORAGE_KEY) || localStorage.getItem('autofleet_tenants_v1');
-      if (stored) {
-        const parsed: Tenant[] = JSON.parse(stored);
-        // Ensure tenant name is updated to RSmotors
-        return parsed.map((t) =>
-          t.id === 'tenant-autoprime-01' ? { ...t, name: 'RSmotors - Soluções Veiculares' } : t
-        );
-      }
-      return INITIAL_TENANTS;
+      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : false; // Start on Login/Tenant screen initially
     } catch {
-      return INITIAL_TENANTS;
+      return false;
     }
   });
 
+  const [tenants, setTenants] = useState<Tenant[]>(() => {
+    return INITIAL_TENANTS;
+  });
+
   const [activeTenantId, setActiveTenantId] = useState<string>(() => {
-    return tenants[0]?.id || INITIAL_TENANTS[0].id;
+    return INITIAL_TENANTS[0].id;
   });
 
   const [currentUser, setCurrentUser] = useState<UserProfile>(() => {
@@ -65,6 +67,14 @@ export const AuthTenantProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   });
 
   const [isPaywallModalOpen, setIsPaywallModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(isAuthenticated));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     try {
@@ -99,6 +109,35 @@ export const AuthTenantProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   
   // Read-only lock when trial has expired
   const isReadOnlyMode = activeTenant.status === 'expired' || (isTrial && trialDaysRemaining <= 0);
+
+  const login = (tenantId: string, userUid?: string) => {
+    const foundTenant = tenants.find((t) => t.id === tenantId);
+    if (foundTenant) {
+      setActiveTenantId(tenantId);
+    }
+    if (userUid) {
+      const foundUser = INITIAL_USERS.find((u) => u.uid === userUid);
+      if (foundUser) {
+        setCurrentUser({ ...foundUser, tenantId: foundTenant ? tenantId : activeTenantId });
+      }
+    }
+    setIsAuthenticated(true);
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+  };
+
+  const addTenant = (tenantData: Omit<Tenant, 'id' | 'createdAt'>): string => {
+    const newId = `tenant-${Date.now()}`;
+    const newTenant: Tenant = {
+      ...tenantData,
+      id: newId,
+      createdAt: new Date().toISOString(),
+    };
+    setTenants((prev) => [newTenant, ...prev]);
+    return newId;
+  };
 
   const setTenantId = (tenantId: string) => {
     const found = tenants.find((t) => t.id === tenantId);
@@ -183,6 +222,10 @@ export const AuthTenantProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         user: currentUser,
         tenants,
         users: INITIAL_USERS,
+        isAuthenticated,
+        login,
+        logout,
+        addTenant,
         setTenantId,
         setUserRole,
         setUserUid,

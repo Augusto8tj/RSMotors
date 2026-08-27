@@ -10,7 +10,8 @@ import {
   ShieldAlert, 
   CheckCircle2, 
   Lock,
-  ArrowRight
+  ArrowRight,
+  LogOut
 } from 'lucide-react';
 import { useAuthTenant } from '../context/AuthTenantContext';
 import { UserRole } from '../types';
@@ -40,6 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     isReadOnlyMode,
     toggleSimulateExpiredTrial,
     openPaywallModal,
+    logout,
   } = useAuthTenant();
 
   const roleColors: Record<UserRole, string> = {
@@ -54,33 +56,29 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16 gap-2">
           
-          {/* Tenant Indicator & Section Title */}
+          {/* Empresa Indicator & Section Title */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            {/* Mobile Brand Mark */}
-            <div className="md:hidden flex items-center shrink-0">
-              <RSMotorsLogo variant="symbol" size="sm" />
+            {/* Mobile / Compact Brand Mark */}
+            <div className="flex items-center shrink-0">
+              <div className="block sm:hidden">
+                <RSMotorsLogo variant="full" size="sm" showSubtitle={false} className="max-w-[130px] h-10" />
+              </div>
+              <div className="hidden sm:block md:hidden">
+                <RSMotorsLogo variant="full" size="sm" showSubtitle={true} className="max-w-[160px] h-11" />
+              </div>
             </div>
 
             <h1 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight hidden md:block">
               Dashboard Executivo
             </h1>
             <span className="text-slate-300 hidden md:inline">|</span>
-            <div className="flex items-center space-x-1 sm:space-x-1.5 bg-slate-100 text-slate-700 px-2 sm:px-3 py-1 rounded-full border border-slate-200 text-[11px] sm:text-xs max-w-[150px] sm:max-w-none truncate">
-              <Building2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-              <span className="hidden sm:inline">Tenant:</span>
-              <select
-                id="tenant-switcher-select"
-                value={tenant.id}
-                onChange={(e) => setTenantId(e.target.value)}
-                className="bg-transparent font-bold text-slate-900 focus:outline-none cursor-pointer pr-1 truncate text-[11px] sm:text-xs"
-                title="Trocar Empresa (Multi-Tenant)"
-              >
-                {tenants.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
+            
+            <div className="hidden xs:flex items-center space-x-1.5 bg-slate-900 text-slate-100 px-2.5 sm:px-3 py-1 rounded-full border border-amber-500/30 text-[11px] sm:text-xs shadow-xs shrink-0">
+              <Building2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="font-bold tracking-tight text-white">RSmotors</span>
+              <span className="text-[9px] uppercase px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold hidden sm:inline">
+                Matriz
+              </span>
             </div>
           </div>
 
@@ -190,6 +188,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                 alt={user.name}
                 className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-slate-200 shadow-xs shrink-0"
               />
+
+              <button
+                id="btn-navbar-logout"
+                onClick={logout}
+                title="Trocar Colaborador / Sair para Login"
+                className="p-1.5 sm:px-2.5 sm:py-1 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 text-xs font-semibold transition flex items-center space-x-1 shrink-0"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">Trocar Usuário</span>
+              </button>
             </div>
 
           </div>

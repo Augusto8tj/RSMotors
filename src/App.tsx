@@ -19,6 +19,7 @@ import { InventoryView } from './components/Inventory/InventoryView';
 import { SellerPerformanceView } from './components/Sellers/SellerPerformanceView';
 import { RSMotorsLogo } from './components/Brand/RSMotorsLogo';
 import { MobileBottomNav } from './components/Navigation/MobileBottomNav';
+import { TenantLoginView } from './components/Auth/TenantLoginView';
 import { 
   loadTenantData, 
   saveVehicle, 
@@ -43,7 +44,7 @@ import {
 } from './types';
 
 function MainApp() {
-  const { tenant, isReadOnlyMode, openPaywallModal } = useAuthTenant();
+  const { tenant, isReadOnlyMode, openPaywallModal, isAuthenticated } = useAuthTenant();
   
   // Navigation State
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
@@ -80,8 +81,14 @@ function MainApp() {
   }, [tenant.id]);
 
   useEffect(() => {
-    reloadData();
-  }, [reloadData]);
+    if (isAuthenticated) {
+      reloadData();
+    }
+  }, [reloadData, isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return <TenantLoginView />;
+  }
 
   // Handlers
   const handleSaveVehicle = (vehicleData: Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>) => {

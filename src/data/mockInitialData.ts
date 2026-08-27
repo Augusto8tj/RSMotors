@@ -15,21 +15,6 @@ export const INITIAL_TENANTS: Tenant[] = [
     state: 'SP',
     phone: '(11) 98765-4321',
     createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'tenant-girorapido-02',
-    name: 'GiroRápido Multimarcas',
-    cnpj: '18.452.901/0001-88',
-    plan: 'pro',
-    status: 'active',
-    trialStartDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-    trialEndDate: new Date(Date.now() + 300 * 24 * 60 * 60 * 1000).toISOString(),
-    plateQueriesLimit: 150,
-    plateQueriesUsed: 64,
-    city: 'Curitiba',
-    state: 'PR',
-    phone: '(41) 99123-5566',
-    createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
   }
 ];
 

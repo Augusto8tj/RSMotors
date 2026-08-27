@@ -12,7 +12,8 @@ import {
   Shield,
   Layers,
   Lock,
-  AlertTriangle
+  AlertTriangle,
+  LogOut
 } from 'lucide-react';
 import { useAuthTenant } from '../context/AuthTenantContext';
 import { UserRole } from '../types';
@@ -28,7 +29,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab, activeAlertCount = 0 }) => {
-  const { tenant, user, isReadOnlyMode } = useAuthTenant();
+  const { tenant, user, isReadOnlyMode, logout } = useAuthTenant();
 
   // Role permissions check
   const canAccessCashFlow = user.role === 'Admin' || user.role === 'Financeiro';
@@ -106,8 +107,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab, active
     <aside className="hidden md:flex w-64 bg-[#0f172a] text-slate-300 flex-col justify-between p-4 border-r border-slate-800 flex-shrink-0 min-h-[calc(100vh-4rem)]">
       <div>
         {/* Brand Header */}
-        <div className="px-1 py-2 mb-3 bg-gradient-to-b from-slate-900/90 to-slate-950/80 rounded-xl border border-slate-800/90 shadow-sm flex flex-col items-center justify-center">
-          <RSMotorsLogo variant="full" size="md" showSubtitle={true} className="w-full px-1" />
+        <div className="relative p-3.5 mb-4 bg-gradient-to-b from-slate-900/95 via-[#080d1a] to-slate-950/95 rounded-2xl border border-amber-500/30 shadow-xl shadow-black/50 flex flex-col items-center justify-center overflow-hidden group">
+          <div className="absolute -top-12 -left-12 w-28 h-28 bg-amber-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/25 transition duration-500" />
+          <div className="absolute -bottom-12 -right-12 w-28 h-28 bg-amber-600/15 rounded-full blur-2xl pointer-events-none" />
+          <RSMotorsLogo variant="full" size="md" showSubtitle={true} className="w-full relative z-10" />
         </div>
 
         {/* Tenant Plan & Credit Card */}
@@ -202,11 +205,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab, active
 
       {/* User Info & RBAC Footer */}
       <div className="pt-4 border-t border-slate-800">
-        <div className="flex items-center space-x-3 p-2 rounded-xl bg-slate-800/60 border border-slate-700/60">
+        <div className="flex items-center space-x-2.5 p-2 rounded-xl bg-slate-800/60 border border-slate-700/60">
           <img
             src={user.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
             alt={user.name}
-            className="w-8 h-8 rounded-full object-cover ring-1 ring-indigo-500/50"
+            className="w-8 h-8 rounded-full object-cover ring-1 ring-indigo-500/50 shrink-0"
           />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-white truncate">{user.name}</p>
@@ -217,11 +220,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab, active
               </span>
             </div>
           </div>
+          <button
+            id="btn-sidebar-logout"
+            onClick={logout}
+            title="Trocar Usuário / Sair"
+            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700/80 rounded-lg transition shrink-0"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
 
-        <div className="mt-2.5 text-[10px] text-slate-400 text-center flex items-center justify-center space-x-1">
-          <Shield className="w-3 h-3 text-indigo-400" />
-          <span>Isolamento Multi-Tenant Ativo</span>
+        <div className="mt-2.5 text-[10px] text-amber-400/80 text-center flex items-center justify-center space-x-1">
+          <Shield className="w-3 h-3 text-amber-400" />
+          <span>Portal Corporativo RSmotors</span>
         </div>
       </div>
     </aside>

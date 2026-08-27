@@ -1,6 +1,6 @@
 {
   "name": "RSmotors - Soluções Veiculares",
-  "description": "SaaS Multi-tenant de gestão de captação, recondicionamento, precificação FIPE, estoque e rentabilidade de frotas da RSmotors - Soluções Veiculares.",
+  "description": "Sistema de gestão de captação, recondicionamento, precificação FIPE, estoque e rentabilidade veicular da RSmotors - Soluções Veiculares.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -17,7 +17,8 @@ import {
   ShieldCheck,
   ChevronRight,
   Plus,
-  AlertTriangle
+  AlertTriangle,
+  LogOut
 } from 'lucide-react';
 import { NavTab } from '../Sidebar';
 import { useAuthTenant } from '../../context/AuthTenantContext';
@@ -50,6 +51,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     trialDaysRemaining,
     isReadOnlyMode,
     openPaywallModal,
+    logout,
   } = useAuthTenant();
 
   const handleTabClick = (tab: NavTab) => {
@@ -84,13 +86,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           <div className="relative w-full max-h-[85vh] bg-[#0f172a] text-slate-200 rounded-t-3xl border-t border-slate-800 shadow-2xl flex flex-col overflow-hidden z-10 animate-in slide-in-from-bottom duration-300">
             
             {/* Header Handle */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
               <div className="flex items-center gap-3">
-                <RSMotorsLogo variant="symbol" size="sm" />
-                <div>
-                  <h3 className="font-bold text-sm text-white">Menu & Recursos RSmotors</h3>
-                  <p className="text-[11px] text-slate-400">Soluções Veiculares completas</p>
-                </div>
+                <RSMotorsLogo variant="full" size="sm" showSubtitle={true} className="max-w-[170px]" />
               </div>
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -266,7 +264,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               </div>
 
               {/* Quick Paywall / Plan Upgrade Trigger */}
-              <div className="pt-2">
+              <div className="pt-2 space-y-2">
                 <button
                   onClick={() => {
                     setIsMenuOpen(false);
@@ -276,6 +274,17 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>Ver Planos & Upgrade RSmotors</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    logout();
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 text-xs font-bold transition flex items-center justify-center space-x-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Trocar Usuário / Sair da Conta</span>
                 </button>
               </div>
 
