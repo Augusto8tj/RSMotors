@@ -12,6 +12,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useAuthTenant } from '../context/AuthTenantContext';
+import { RSMotorsLogo } from './Brand/RSMotorsLogo';
 
 export const PaywallModal: React.FC = () => {
   const { 
@@ -30,26 +31,29 @@ export const PaywallModal: React.FC = () => {
       <div className="bg-white border border-slate-200 w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden text-slate-900 flex flex-col">
         
         {/* Header */}
-        <div className="relative bg-slate-50 p-6 border-b border-slate-200 flex items-start justify-between">
-          <div>
-            <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-semibold mb-2">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>AutoFleet SaaS Enterprise</span>
+        <div className="relative bg-slate-950 p-6 border-b border-slate-800 flex items-start justify-between text-white">
+          <div className="flex items-center gap-4">
+            <RSMotorsLogo variant="symbol" size="md" />
+            <div>
+              <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-1">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>RSmotors - Soluções Veiculares Enterprise</span>
+              </div>
+              <h2 className="text-xl font-bold text-white tracking-tight">
+                {isReadOnlyMode ? 'Período de Testes Expirado' : 'Assinatura & Planos RSmotors'}
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5 max-w-lg">
+                {isReadOnlyMode 
+                  ? 'Seus dados e relatórios estão seguros e disponíveis em modo somente-leitura. Assine um plano para reativar cadastros, lançamentos de custos e consultas de placas.'
+                  : 'Aumente a rentabilidade e o giro de estoque da sua revendedora com nossa plataforma completa de captação e DRE.'}
+              </p>
             </div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-              {isReadOnlyMode ? 'Período de Testes Expirado' : 'Assinatura & Planos AutoFleet'}
-            </h2>
-            <p className="text-xs text-slate-500 mt-1 max-w-lg">
-              {isReadOnlyMode 
-                ? 'Seus dados e relatórios estão seguros e disponíveis em modo somente-leitura. Assine um plano para reativar cadastros, lançamentos de custos e consultas de placas.'
-                : 'Aumente a rentabilidade e o giro de estoque da sua revendedora com nossa plataforma completa de captação e DRE.'}
-            </p>
           </div>
           
           <button
             id="close-paywall-modal-btn"
             onClick={closePaywallModal}
-            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition"
+            className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition"
           >
             <X className="w-5 h-5" />
           </button>

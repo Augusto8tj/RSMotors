@@ -125,12 +125,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Period Selector Tabs */}
-        <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
-          <Calendar className="w-3.5 h-3.5 text-slate-400 ml-2" />
+        <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs overflow-x-auto max-w-full scrollbar-none">
+          <Calendar className="w-3.5 h-3.5 text-slate-400 ml-2 shrink-0 hidden sm:block" />
           <button
             id="period-este-mes"
             onClick={() => setPeriod('este_mes')}
-            className={`px-3 py-1 rounded-md font-medium transition ${
+            className={`px-3 py-1.5 sm:py-1 rounded-md font-medium transition whitespace-nowrap ${
               period === 'este_mes'
                 ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200/80'
                 : 'text-slate-600 hover:text-slate-900'
@@ -141,7 +141,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <button
             id="period-mes-passado"
             onClick={() => setPeriod('mes_passado')}
-            className={`px-3 py-1 rounded-md font-medium transition ${
+            className={`px-3 py-1.5 sm:py-1 rounded-md font-medium transition whitespace-nowrap ${
               period === 'mes_passado'
                 ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200/80'
                 : 'text-slate-600 hover:text-slate-900'
@@ -152,7 +152,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <button
             id="period-90-dias"
             onClick={() => setPeriod('ultimos_90')}
-            className={`px-3 py-1 rounded-md font-medium transition ${
+            className={`px-3 py-1.5 sm:py-1 rounded-md font-medium transition whitespace-nowrap ${
               period === 'ultimos_90'
                 ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200/80'
                 : 'text-slate-600 hover:text-slate-900'
@@ -163,7 +163,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <button
             id="period-ano"
             onClick={() => setPeriod('ano')}
-            className={`px-3 py-1 rounded-md font-medium transition ${
+            className={`px-3 py-1.5 sm:py-1 rounded-md font-medium transition whitespace-nowrap ${
               period === 'ano'
                 ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200/80'
                 : 'text-slate-600 hover:text-slate-900'
@@ -174,7 +174,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <button
             id="period-todos"
             onClick={() => setPeriod('todos')}
-            className={`px-3 py-1 rounded-md font-medium transition ${
+            className={`px-3 py-1.5 sm:py-1 rounded-md font-medium transition whitespace-nowrap ${
               period === 'todos'
                 ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200/80'
                 : 'text-slate-600 hover:text-slate-900'

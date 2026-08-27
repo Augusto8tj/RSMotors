@@ -17,6 +17,8 @@ import { PlateQueryView } from './components/PlateQuery/PlateQueryView';
 import { CashFlowView } from './components/CashFlow/CashFlowView';
 import { InventoryView } from './components/Inventory/InventoryView';
 import { SellerPerformanceView } from './components/Sellers/SellerPerformanceView';
+import { RSMotorsLogo } from './components/Brand/RSMotorsLogo';
+import { MobileBottomNav } from './components/Navigation/MobileBottomNav';
 import { 
   loadTenantData, 
   saveVehicle, 
@@ -161,7 +163,7 @@ function MainApp() {
         />
 
         {/* Content View Area */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto overflow-x-hidden min-w-0">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto overflow-x-hidden min-w-0 pb-28 md:pb-8">
           {activeTab === 'dashboard' && (
             <DashboardView
               vehicles={vehicles}
@@ -253,12 +255,48 @@ function MainApp() {
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-6">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                  <h2 className="text-lg font-bold text-slate-900">Configurações & Governança Multi-Tenant</h2>
-                  <p className="text-xs text-slate-500">Planos, limites de consulta, isolamento por tenantId e RBAC</p>
+                  <h2 className="text-lg font-bold text-slate-900">Configurações & Governança da Empresa</h2>
+                  <p className="text-xs text-slate-500">Identidade visual, planos, limites de consulta, isolamento por tenantId e RBAC</p>
                 </div>
-                <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  Tenant: {tenant.name} ({tenant.id})
+                <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                  Tenant: {tenant.name}
                 </span>
+              </div>
+
+              {/* Brand Customization Showcase */}
+              <div className="p-5 bg-gradient-to-br from-slate-950 via-slate-900 to-black rounded-2xl border border-slate-800 text-white">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="space-y-2 text-center md:text-left">
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      Identidade Visual Ativa
+                    </span>
+                    <h3 className="text-xl font-bold text-white tracking-tight">
+                      RSmotors - Soluções Veiculares
+                    </h3>
+                    <p className="text-xs text-slate-400 max-w-md">
+                      Logotipo corporativo com emblema cromado e dourado, velocímetro e tipografia esportiva integrado em relatórios, sidebar, navbar e painéis de controle.
+                    </p>
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      <span className="text-[11px] bg-amber-500/15 text-amber-300 font-medium px-2.5 py-1 rounded-lg border border-amber-500/30">
+                        Diretora Gerente: Samara Jéssica Moura De Seixas
+                      </span>
+                      <span className="text-[11px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700">
+                        CNPJ: {tenant.cnpj}
+                      </span>
+                      <span className="text-[11px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700">
+                        Cidade: {tenant.city}/{tenant.state}
+                      </span>
+                      <span className="text-[11px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700">
+                        Email corporativo: @rsmotors.com.br
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-900/90 p-4 rounded-xl border border-slate-800 shadow-inner flex flex-col items-center justify-center min-w-[240px]">
+                    <span className="text-[10px] text-slate-500 font-semibold mb-2">Pré-visualização Oficial</span>
+                    <RSMotorsLogo variant="full" size="md" showSubtitle={true} />
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -289,6 +327,20 @@ function MainApp() {
           )}
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar & Mobile Drawer */}
+      <MobileBottomNav
+        activeTab={activeTab}
+        onSelectTab={(tab) => setActiveTab(tab)}
+        activeAlertCount={activeAlertCount}
+        onOpenAddVehicle={() => {
+          if (isReadOnlyMode) openPaywallModal();
+          else {
+            setInitialRegistrationData(undefined);
+            setIsAddVehicleOpen(true);
+          }
+        }}
+      />
 
       {/* Paywall Trial Expiration Modal */}
       <PaywallModal />

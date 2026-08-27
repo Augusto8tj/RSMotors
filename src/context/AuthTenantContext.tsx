@@ -24,14 +24,21 @@ interface AuthTenantContextType {
 
 const AuthTenantContext = createContext<AuthTenantContextType | undefined>(undefined);
 
-const TENANT_STORAGE_KEY = 'autofleet_tenants_v1';
-const USER_STORAGE_KEY = 'autofleet_current_user_v1';
+const TENANT_STORAGE_KEY = 'rsmotors_tenants_v2';
+const USER_STORAGE_KEY = 'rsmotors_current_user_v2';
 
 export const AuthTenantProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [tenants, setTenants] = useState<Tenant[]>(() => {
     try {
-      const stored = localStorage.getItem(TENANT_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : INITIAL_TENANTS;
+      const stored = localStorage.getItem(TENANT_STORAGE_KEY) || localStorage.getItem('autofleet_tenants_v1');
+      if (stored) {
+        const parsed: Tenant[] = JSON.parse(stored);
+        // Ensure tenant name is updated to RSmotors
+        return parsed.map((t) =>
+          t.id === 'tenant-autoprime-01' ? { ...t, name: 'RSmotors - Soluções Veiculares' } : t
+        );
+      }
+      return INITIAL_TENANTS;
     } catch {
       return INITIAL_TENANTS;
     }
@@ -43,8 +50,15 @@ export const AuthTenantProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const [currentUser, setCurrentUser] = useState<UserProfile>(() => {
     try {
-      const stored = localStorage.getItem(USER_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : INITIAL_USERS[0];
+      const stored = localStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem('autofleet_current_user_v1');
+      if (stored) {
+        const parsed: UserProfile = JSON.parse(stored);
+        if (parsed.uid === 'user-admin-01' || parsed.role === 'Admin') {
+          return INITIAL_USERS[0];
+        }
+        return parsed;
+      }
+      return INITIAL_USERS[0];
     } catch {
       return INITIAL_USERS[0];
     }

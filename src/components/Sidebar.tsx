@@ -17,6 +17,7 @@ import {
 import { useAuthTenant } from '../context/AuthTenantContext';
 import { UserRole } from '../types';
 import { getStockAlertsByTenant } from '../services/dbService';
+import { RSMotorsLogo } from './Brand/RSMotorsLogo';
 
 export type NavTab = 'dashboard' | 'vehicles' | 'inventory' | 'sellers' | 'calculator' | 'plate_query' | 'cash_flow' | 'settings';
 
@@ -102,16 +103,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab, active
   ];
 
   return (
-    <aside className="w-64 bg-[#0f172a] text-slate-300 flex flex-col justify-between p-4 border-r border-slate-800 flex-shrink-0 min-h-[calc(100vh-4rem)]">
+    <aside className="hidden md:flex w-64 bg-[#0f172a] text-slate-300 flex-col justify-between p-4 border-r border-slate-800 flex-shrink-0 min-h-[calc(100vh-4rem)]">
       <div>
         {/* Brand Header */}
-        <div className="px-2 py-3 mb-3 flex items-center gap-3">
-          <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">
-            A
-          </div>
-          <span className="font-bold text-lg text-white tracking-tight">
-            AutoFleet <span className="text-indigo-400 font-normal">SaaS</span>
-          </span>
+        <div className="px-1 py-2 mb-3 bg-gradient-to-b from-slate-900/90 to-slate-950/80 rounded-xl border border-slate-800/90 shadow-sm flex flex-col items-center justify-center">
+          <RSMotorsLogo variant="full" size="md" showSubtitle={true} className="w-full px-1" />
         </div>
 
         {/* Tenant Plan & Credit Card */}
