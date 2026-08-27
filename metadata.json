@@ -1,0 +1,6 @@
+{
+  "name": "AutoFleet SaaS",
+  "description": "SaaS Multi-tenant de gestão de captação, recondicionamento, precificação FIPE e rentabilidade de frotas para revendedoras de veículos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

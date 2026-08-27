@@ -1,0 +1,180 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to fetch the user's profile document
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    // Helper function to check if user belongs to the specified tenant
+    function belongsToTenant(tenantId) {
+      return isAuthenticated() && getUserData().tenantId == tenantId;
+    }
+    
+    // Helper function to check if tenant subscription is active or in trial
+    function isTenantActive(tenantId) {
+      let tenant = get(/databases/$(database)/documents/tenants/$(tenantId)).data;
+      return tenant.status == 'active' || 
+             (tenant.status == 'trial' && request.time < tenant.trialEndDate);
+    }
+    
+    // Helper function for Role-Based Access Control (RBAC)
+    function hasRole(role) {
+      return isAuthenticated() && getUserData().role == role;
+    }
+    
+    function isAdmin() {
+      return hasRole('Admin');
+    }
+    
+    function isFinancial() {
+      return hasRole('Admin') || hasRole('Financeiro');
+    }
+    
+    function isBuyer() {
+      return hasRole('Admin') || hasRole('Comprador');
+    }
+    
+    function isSeller() {
+      return hasRole('Admin') || hasRole('Vendedor');
+    }
+
+    // -------------------------------------------------------------
+    // TENANTS COLLECTION
+    // -------------------------------------------------------------
+    match /tenants/{tenantId} {
+      // Any authenticated user belonging to this tenant can read their tenant info
+      allow read: if belongsToTenant(tenantId);
+      // Only Admins of this tenant or System Superadmins can update tenant details
+      allow update: if belongsToTenant(tenantId) && isAdmin();
+      // Tenant creation is restricted to platform registration
+      allow create: if isAuthenticated();
+      allow delete: if false; // Soft deletes preferred
+    }
+
+    // -------------------------------------------------------------
+    // USERS COLLECTION (RBAC & Tenant Binding)
+    // -------------------------------------------------------------
+    match /users/{userId} {
+      // Users can read their own profile, or Admins can read users within their tenant
+      allow read: if isAuthenticated() && (
+        request.auth.uid == userId || 
+        (resource.data.tenantId == getUserData().tenantId && isAdmin())
+      );
+      // Only Tenant Admin can create or modify users within their tenant
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'tenantId'])) ||
+        (resource.data.tenantId == getUserData().tenantId && isAdmin())
+      );
+      allow delete: if isAuthenticated() && resource.data.tenantId == getUserData().tenantId && isAdmin();
+    }
+
+    // -------------------------------------------------------------
+    // VEHICLES COLLECTION (Multi-tenant Segregation & Immutable FIPE)
+    // -------------------------------------------------------------
+    match /vehicles/{vehicleId} {
+      // Read allowed if user belongs to the tenant
+      allow read: if belongsToTenant(resource.data.tenantId);
+      
+      // Write allowed only if tenant subscription is valid and user has appropriate role
+      allow create: if isAuthenticated() && 
+                    belongsToTenant(request.resource.data.tenantId) && 
+                    isTenantActive(request.resource.data.tenantId) &&
+                    (isAdmin() || isBuyer());
+                    
+      allow update: if isAuthenticated() && 
+                    belongsToTenant(resource.data.tenantId) && 
+                    isTenantActive(resource.data.tenantId) &&
+                    (isAdmin() || isBuyer() || isSeller() || isFinancial()) &&
+                    // Enforce frozen FIPE purchase baseline once created
+                    request.resource.data.fipeAtPurchase == resource.data.fipeAtPurchase;
+                    
+      allow delete: if isAuthenticated() && 
+                    belongsToTenant(resource.data.tenantId) && 
+                    isAdmin();
+    }
+
+    // -------------------------------------------------------------
+    // EXPENSES COLLECTION (Linked to Vehicle DRE)
+    // -------------------------------------------------------------
+    match /expenses/{expenseId} {
+      allow read: if belongsToTenant(resource.data.tenantId);
+      
+      allow create: if isAuthenticated() && 
+                    belongsToTenant(request.resource.data.tenantId) && 
+                    isTenantActive(request.resource.data.tenantId) &&
+                    (isAdmin() || isFinancial() || isBuyer());
+                    
+      allow update: if isAuthenticated() && 
+                    belongsToTenant(resource.data.tenantId) && 
+                    isTenantActive(resource.data.tenantId) &&
+                    (isAdmin() || isFinancial());
+                    
+      allow delete: if isAuthenticated() && 
+                    belongsToTenant(resource.data.tenantId) && 
+                    (isAdmin() || isFinancial());
+    }
+
+    // -------------------------------------------------------------
+    // SALES COLLECTION (Vehicle Sales, ROI & Profit)
+    // -------------------------------------------------------------
+    match /sales/{saleId} {
+      allow read: if belongsToTenant(resource.data.tenantId) && 
+                  (isAdmin() || isFinancial() || isSeller() || isBuyer());
+                  
+      allow create: if isAuthenticated() && 
+                    belongsToTenant(request.resource.data.tenantId) && 
+                    isTenantActive(request.resource.data.tenantId) &&
+                    (isAdmin() || isSeller() || isFinancial());
+                    
+      allow update: if isAuthenticated() && 
+                    belongsToTenant(resource.data.tenantId) && 
+                    isTenantActive(resource.data.tenantId) &&
+                    (isAdmin() || isFinancial());
+                    
+      allow delete: if isAuthenticated() && 
+                    belongsToTenant(resource.data.tenantId) && 
+                    isAdmin();
+    }
+
+    // -------------------------------------------------------------
+    // CASH FLOW COLLECTION (Extrato & Fluxo de Caixa)
+    // -------------------------------------------------------------
+    match /cash_flow/{cashFlowId} {
+      // Cash flow restricted to Admin and Financeiro
+      allow read: if belongsToTenant(resource.data.tenantId) && isFinancial();
+      
+      allow create: if isAuthenticated() && 
+                    belongsToTenant(request.resource.data.tenantId) && 
+                    isTenantActive(request.resource.data.tenantId) &&
+                    isFinancial();
+                    
+      allow update: if isAuthenticated() && 
+                    belongsToTenant(resource.data.tenantId) && 
+                    isTenantActive(resource.data.tenantId) &&
+                    isFinancial();
+                    
+      allow delete: if isAuthenticated() && 
+                    belongsToTenant(resource.data.tenantId) && 
+                    isAdmin();
+    }
+
+    // -------------------------------------------------------------
+    // PLATE QUERIES LOG (Credit consumption tracking)
+    // -------------------------------------------------------------
+    match /plate_queries/{queryId} {
+      allow read: if belongsToTenant(resource.data.tenantId);
+      allow create: if isAuthenticated() && 
+                    belongsToTenant(request.resource.data.tenantId) &&
+                    isTenantActive(request.resource.data.tenantId);
+      allow update, delete: if false; // Immutable audit log
+    }
+  }
+}

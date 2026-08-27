@@ -1,0 +1,107 @@
+{
+  "entities": {
+    "tenants": {
+      "description": "Dados da empresa revendedora, plano, trial e limites",
+      "fields": {
+        "id": { "type": "string", "description": "Tenant ID único" },
+        "name": { "type": "string", "description": "Nome Fantasia da Revendedora" },
+        "cnpj": { "type": "string", "description": "CNPJ formatado" },
+        "plan": { "type": "string", "enum": ["trial", "pro", "enterprise"], "description": "Plano contratado" },
+        "status": { "type": "string", "enum": ["active", "trial", "expired", "suspended"], "description": "Status da assinatura" },
+        "trialStartDate": { "type": "string", "description": "Data de início do trial ISO 8601" },
+        "trialEndDate": { "type": "string", "description": "Data de expiração do trial (14 dias)" },
+        "plateQueriesLimit": { "type": "number", "description": "Limite mensal de consultas de placa" },
+        "plateQueriesUsed": { "type": "number", "description": "Consultas utilizadas no mês corrente" },
+        "createdAt": { "type": "string", "description": "Timestamp de criação" }
+      }
+    },
+    "users": {
+      "description": "Usuários do sistema vinculados ao Tenant e RBAC",
+      "fields": {
+        "uid": { "type": "string", "description": "Auth UID do Firebase" },
+        "tenantId": { "type": "string", "description": "ID do tenant associado" },
+        "name": { "type": "string", "description": "Nome completo" },
+        "email": { "type": "string", "description": "E-mail de login" },
+        "role": { "type": "string", "enum": ["Admin", "Comprador", "Vendedor", "Financeiro"], "description": "Papel RBAC" },
+        "avatarUrl": { "type": "string", "description": "URL do avatar" },
+        "active": { "type": "boolean", "description": "Status do usuário" }
+      }
+    },
+    "vehicles": {
+      "description": "Estoque de veículos com congelamento FIPE e Data de Entrada Real no Pátio",
+      "fields": {
+        "id": { "type": "string", "description": "ID do veículo" },
+        "tenantId": { "type": "string", "description": "Tenant ID para isolamento" },
+        "plate": { "type": "string", "description": "Placa do veículo (ex: ABC1D23)" },
+        "chassis": { "type": "string", "description": "Chassi do veículo" },
+        "brand": { "type": "string", "description": "Marca/Fabricante" },
+        "model": { "type": "string", "description": "Modelo do veículo" },
+        "version": { "type": "string", "description": "Versão/Motorização" },
+        "yearFab": { "type": "number", "description": "Ano de Fabricação" },
+        "yearModel": { "type": "number", "description": "Ano do Modelo" },
+        "color": { "type": "string", "description": "Cor" },
+        "fuel": { "type": "string", "description": "Combustível (Flex, Gasolina, Diesel, Elétrico, Híbrido)" },
+        "mileage": { "type": "number", "description": "Quilometragem atual" },
+        "fipeAtPurchase": { "type": "number", "description": "Valor FIPE CONGELADO na data da compra" },
+        "fipeCode": { "type": "string", "description": "Código FIPE oficial" },
+        "fipeMonthRef": { "type": "string", "description": "Mês de referência FIPE congelado (ex: março de 2026)" },
+        "currentFipeValue": { "type": "number", "description": "Valor FIPE do mês atual para monitoramento" },
+        "purchasePrice": { "type": "number", "description": "Preço efetivamente pago na captação" },
+        "entryDate": { "type": "string", "description": "Data de Entrada Real no Pátio (Regra de Ouro)" },
+        "status": { "type": "string", "enum": ["Em Operação", "Disponível", "Vendido"], "description": "Status operacional no pátio" },
+        "buyerId": { "type": "string", "description": "UID do comprador responsável" },
+        "buyerName": { "type": "string", "description": "Nome do comprador" },
+        "notes": { "type": "string", "description": "Observações do laudo e captação" },
+        "photos": { "type": "array", "items": { "type": "string" }, "description": "URLs das fotos no Firebase Storage" }
+      }
+    },
+    "expenses": {
+      "description": "Custos e despesas vinculados ao DRE por veículo",
+      "fields": {
+        "id": { "type": "string", "description": "ID da despesa" },
+        "tenantId": { "type": "string", "description": "Tenant ID" },
+        "vehicleId": { "type": "string", "description": "ID do veículo associado" },
+        "category": { "type": "string", "enum": ["funilaria", "mecanica", "despachante", "higienizacao", "pneus", "acessorios", "outros"], "description": "Categoria do serviço" },
+        "description": { "type": "string", "description": "Descrição do serviço executado" },
+        "amount": { "type": "number", "description": "Valor em R$" },
+        "date": { "type": "string", "description": "Data do serviço" },
+        "responsibleUser": { "type": "string", "description": "Responsável pela autorização" },
+        "invoiceNumber": { "type": "string", "description": "Número da NF ou OS" },
+        "status": { "type": "string", "enum": ["paid", "pending"], "description": "Status de pagamento" }
+      }
+    },
+    "sales": {
+      "description": "Histórico de vendas com apuração de lucro líquido e ROI",
+      "fields": {
+        "id": { "type": "string", "description": "ID da venda" },
+        "tenantId": { "type": "string", "description": "Tenant ID" },
+        "vehicleId": { "type": "string", "description": "ID do veículo vendido" },
+        "saleDate": { "type": "string", "description": "Data efetiva da venda" },
+        "salePrice": { "type": "number", "description": "Valor final negociado de venda" },
+        "paymentMethod": { "type": "string", "enum": ["pix", "financiamento", "cartao", "ted", "troca_com_troco", "misto"], "description": "Forma de pagamento" },
+        "commissionAmount": { "type": "number", "description": "Valor da comissão do vendedor" },
+        "sellerId": { "type": "string", "description": "UID do vendedor" },
+        "sellerName": { "type": "string", "description": "Nome do vendedor" },
+        "customerName": { "type": "string", "description": "Nome do cliente comprador" },
+        "customerCpf": { "type": "string", "description": "CPF ou CNPJ do cliente" },
+        "netProfit": { "type": "number", "description": "Lucro líquido apurado no DRE" },
+        "roiPercentage": { "type": "number", "description": "Retorno sobre o Investimento (%)" },
+        "daysInYard": { "type": "number", "description": "Dias totais no pátio até a venda" }
+      }
+    },
+    "cash_flow": {
+      "description": "Extrato financeiro global da loja com entradas e saídas",
+      "fields": {
+        "id": { "type": "string", "description": "ID do lançamento" },
+        "tenantId": { "type": "string", "description": "Tenant ID" },
+        "type": { "type": "string", "enum": ["entrada", "saida"], "description": "Tipo de movimentação" },
+        "category": { "type": "string", "description": "Categoria contábil" },
+        "amount": { "type": "number", "description": "Valor em R$" },
+        "date": { "type": "string", "description": "Data da movimentação" },
+        "description": { "type": "string", "description": "Descrição detalhada" },
+        "vehicleId": { "type": "string", "description": "Veículo relacionado (opcional)" },
+        "status": { "type": "string", "enum": ["confirmado", "previsto"], "description": "Status do lançamento" }
+      }
+    }
+  }
+}
